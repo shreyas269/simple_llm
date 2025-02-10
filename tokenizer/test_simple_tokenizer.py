@@ -1,5 +1,5 @@
 import unittest
-from simple_tokenizer import SimpleTokenizer
+from tokenizer.simple_tokenizer import SimpleTokenizer
 
 class TestSimpleTokenizer(unittest.TestCase):
     def setUp(self):

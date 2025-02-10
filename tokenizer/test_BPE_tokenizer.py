@@ -1,5 +1,5 @@
 import unittest
-from load_BPE_tokenizer import load_bpe_tokenizer
+from tokenizer.load_BPE_tokenizer import load_bpe_tokenizer
 
 class TestBPETokenizer(unittest.TestCase):
 
