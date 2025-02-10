@@ -14,8 +14,8 @@ class load_bpe_tokenizer:
     
     def get_encoding_for_model(self, model):
         if model:
-            enc = tiktoken.get_encoding_for_model(model)
+            enc = tiktoken.encoding_for_model(model)
         else:
-            enc = tiktoken.get_encoding_for_model(self.model)
+            enc = tiktoken.encoding_for_model(self.model)
         return enc
     
