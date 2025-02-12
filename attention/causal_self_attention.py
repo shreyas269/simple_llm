@@ -17,14 +17,14 @@ class CausalSelfAttention(nn.Module):
 
     def forward(self, x):
         batches, num_tokens, d_in = x.shape
-        keys = self.W_key(x)
-        queries = self.W_query(x)
-        values = self.W_value(x)
-        attn_scores = queries @ keys.transpose(1, 2)
+        keys = self.W_key(x) # shape (batches, num_tokens, d_out)
+        queries = self.W_query(x) # shape (batches, num_tokens, d_out)
+        values = self.W_value(x) # shape (batches, num_tokens, d_out)
+        attn_scores = queries @ keys.transpose(1, 2) # shape (batches, num_tokens, num_tokens)
         # Apply mask to the attention scores
         attn_scores.masked_fill_(self.mask.bool()[:num_tokens, :num_tokens], -torch.inf)
         d_k = keys.shape[-1]
-        attn_weights = torch.softmax(attn_scores/d_k**0.5, dim=-1)
+        attn_weights = torch.softmax(attn_scores/d_k**0.5, dim=-1) # shape (batches, num_tokens, num_tokens)
         attn_weights = self.dropout(attn_weights)
-        context_vec = attn_weights @ values
+        context_vec = attn_weights @ values # shape (batches, num_tokens, d_out)
         return context_vec
