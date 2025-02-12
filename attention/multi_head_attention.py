@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
 
+# Ideally in Llama and other GPT like models, as you increase the number of heads, it is recommended 
+# to reduce the dimension of the context vectors by same scale
+
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_in, d_out, context_length, dropout, num_heads, qkv_bias=False):
         super.__init__()
