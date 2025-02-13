@@ -22,6 +22,12 @@ class GPTModel(nn.Module):
         x = tok_embs + pos_embs
         x = self.dropout(x)
         x = self.transformer_blocks(x)
-        x = self.norm_layer(x)
+        
+        # You probably do not need an attention_mask here (Check once) 
+        # The attention mask is typically used within the TransformerBlock to prevent information leakage 
+        # during the self-attention mechanism. 
+        # The LayerNorm operation is applied independently to each position in the sequence
+        #  and does not involve interactions between different positions.
+        x = self.norm_layer(x) 
         logits = self.out_head(x)
         return logits
