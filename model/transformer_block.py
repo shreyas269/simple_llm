@@ -34,7 +34,7 @@ class TransformerBlock(nn.Module):
 
         x = self.norm2(x)
         x = self.feedforward(x)
-        x = x.dropout(x)
+        x = self.dropout(x)
         
         x = x + shortcut
         return x
