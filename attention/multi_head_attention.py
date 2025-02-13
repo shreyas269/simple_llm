@@ -6,7 +6,7 @@ import torch.nn as nn
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_in, d_out, context_length, dropout, num_heads, qkv_bias=False):
-        super.__init__()
+        super().__init__()
         # d_out here is the stacked dimension of the context vectors
         assert (d_out % num_heads == 0), "d_out must be divisible by num_heads"
         self.d_out = d_out
@@ -39,7 +39,7 @@ class MultiHeadAttention(nn.Module):
         values = values.transpose(1, 2) # shape (batches, num_heads, num_tokens, head_dim)
 
         # Compute the attention scores for each head
-        attn_scores = queries @ keys.transpose(1, 2) # shape (batches, num_heads, num_tokens, num_tokens)
+        attn_scores = queries @ keys.transpose(2, 3) # shape (batches, num_heads, num_tokens, num_tokens)
         
         # Apply mask to the attention scores
         mask_bool = self.mask.bool()[:num_tokens, :num_tokens]
