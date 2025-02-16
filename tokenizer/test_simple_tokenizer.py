@@ -1,5 +1,9 @@
+import sys
+import os
+# Add the parent directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import unittest
-from tokenizer.simple_tokenizer import SimpleTokenizer
+from simple_tokenizer import SimpleTokenizer
 
 class TestSimpleTokenizer(unittest.TestCase):
     def setUp(self):
