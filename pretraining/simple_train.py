@@ -152,6 +152,12 @@ def main(gpt_config, settings):
 
     model = GPTModel(gpt_config)
     model.to(device)
+
+    # AdamW decouples the weight decay from the optimization steps.
+    # This is useful when using L2 regularization to prevent overfitting.
+    # Basically it ensures a uniform and consistent weight decay across all parameters independent of learning rates
+    # Step 1: Perform momentum based gradient update (RMSprop + momentum)
+    # Step 2: Perform weight decay update after the parameter update for consistent weight decay across layers
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=settings["learning_rate"], weight_decay=settings["weight_decay"]
     )
