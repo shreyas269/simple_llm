@@ -5,7 +5,7 @@ class LLMDataset(Dataset):
         self.input_ids = []
         self.target_ids = []
 
-        token_ids = tokenizer.encode(text)
+        token_ids = tokenizer.encode(text, allowed_special={"<|endoftext|>"})
 
         for i in range(0, len(token_ids) - max_length, stride):
             input_text_chunk = token_ids[i:i + max_length]
