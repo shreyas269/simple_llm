@@ -1,4 +1,7 @@
+import sys
 import os
+# Add the parent directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import unittest
 from tokenizer.load_BPE_tokenizer import load_bpe_tokenizer
 from data_sampling.create_llm_dataset import LLMDataset
