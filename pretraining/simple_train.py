@@ -10,6 +10,8 @@ from torch.utils.data import Dataset, DataLoader
 from generation.generate import generate_text
 from model.GPT_model import GPTModel
 
+from torch.amp import autocast, GradScaler
+
 class GPTDatasetV1(Dataset):
     def __init__(self, txt, tokenizer, max_length, stride):
         self.input_ids = []
@@ -105,7 +107,7 @@ def generate_and_print_sample(model, tokenizer, device, start_context):
 
 
 def train_model_simple(model, train_loader, val_loader, optimizer, device, num_epochs,
-                       eval_freq, eval_iter, start_context, tokenizer):
+                       eval_freq, eval_iter, start_context, tokenizer, scaler):
     train_losses, val_losses, track_tokens_seen = [], [], []
     tokens_seen = 0
     global_step = -1
@@ -115,9 +117,11 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
 
         for input_batch, target_batch in train_loader:
             optimizer.zero_grad() 
-            loss = calc_loss_batch(input_batch, target_batch, model, device)
-            loss.backward()  
-            optimizer.step() 
+            with autocast(device_type=str(device)):
+                loss = calc_loss_batch(input_batch, target_batch, model, device)
+                scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
 
             tokens_seen += input_batch.numel()
             global_step += 1
@@ -141,8 +145,7 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
 
 def main(gpt_config, settings):
     torch.manual_seed(123)
-    device = torch.device("mps" if torch.mps.is_available() else "cpu")
-    device = torch.device("cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     print(f"Using device {device}")
 
     file_path = 'data/the-verdict.txt'
@@ -161,6 +164,7 @@ def main(gpt_config, settings):
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=settings["learning_rate"], weight_decay=settings["weight_decay"]
     )
+    scaler = torch.amp.GradScaler("cuda") # Wil be disabled automatically if device is not cuda
 
     train_ratio = 0.90
     split_idx = int(train_ratio * len(text_data))
@@ -190,7 +194,8 @@ def main(gpt_config, settings):
     train_losses, val_losses, tokens_seen = train_model_simple(
         model, train_loader, val_loader, optimizer, device,
         num_epochs=settings["num_epochs"], eval_freq=5, eval_iter=1,
-        start_context="Every effort moves you", tokenizer=tokenizer
+        start_context="Every effort moves you", tokenizer=tokenizer,
+        scaler=scaler
     )
 
     return train_losses, val_losses, tokens_seen, model
