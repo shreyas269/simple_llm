@@ -13,7 +13,7 @@ class GPTModel(nn.Module):
         self.norm_layer = LayerNorm(cfg["emb_dim"])
 
         # This is the output layer that predicts the next token in the sequence using CE loss over logits generated over entire vocab
-        self.out_head = nn.Linear(cfg["emb_dim"], cfg["vocab_size"])
+        self.out_head = nn.Linear(cfg["emb_dim"], cfg["vocab_size"], bias=False)
 
     def forward(self, input):
         batch_size, seq_length = input.shape
